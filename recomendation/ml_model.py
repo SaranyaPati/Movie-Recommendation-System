@@ -38,7 +38,7 @@ log = logging.getLogger(__name__)
 # ── Globals (loaded once at startup) ──────────────────────────────────────────
 movies_df       = None   # pd.DataFrame: movieId, title, genres, year, ...
 ratings_df      = None   # pd.DataFrame: userId, movieId, rating
-cosine_sim      = None   # np.ndarray  : movie × movie similarity
+combined_norm   = None   # sparse matrix: movie feature vectors
 tfidf_titles    = None   # TfidfVectorizer fitted on titles
 tfidf_matrix_t  = None   # tfidf matrix for title search
 movie_idx       = None   # dict: title → row index in cosine_sim
@@ -228,15 +228,15 @@ def _cache_path(name):
 
 
 def train_content_based(force=False):
-    """Build TF-IDF + cosine similarity matrix. Cached to disk."""
-    global cosine_sim, tfidf_titles, tfidf_matrix_t, movie_idx, idx_movie
+    """Build TF-IDF vectors. Cached to disk."""
+    global combined_norm, tfidf_titles, tfidf_matrix_t, movie_idx, idx_movie
 
-    cs_path = _cache_path("cosine_sim.pkl")
+    cs_path = _cache_path("combined_norm.pkl")
     ti_path = _cache_path("tfidf_titles.pkl")
 
     if not force and os.path.exists(cs_path) and os.path.exists(ti_path):
         log.info("Loading content-based model from cache…")
-        with open(cs_path, "rb") as f: cosine_sim = pickle.load(f)
+        with open(cs_path, "rb") as f: combined_norm = pickle.load(f)
         with open(ti_path, "rb") as f:
             tfidf_titles, tfidf_matrix_t = pickle.load(f)
     else:
@@ -253,14 +253,14 @@ def train_content_based(force=False):
         # Weighted blend: 80% genre, 20% title
         from scipy.sparse import hstack
         combined = hstack([genre_matrix * 0.8, title_matrix * 0.2])
-        combined_norm = normalize(combined, norm="l2")
-        cosine_sim = cosine_similarity(combined_norm, combined_norm)
+        global_combined = normalize(combined, norm="l2")
+        combined_norm = global_combined
 
         # Title search TF-IDF (separate, for search endpoint)
         tfidf_titles = TfidfVectorizer(ngram_range=(1, 2), stop_words="english")
         tfidf_matrix_t = tfidf_titles.fit_transform(movies_df["clean_title"].fillna(""))
 
-        with open(cs_path, "wb") as f: pickle.dump(cosine_sim, f, protocol=4)
+        with open(cs_path, "wb") as f: pickle.dump(combined_norm, f, protocol=4)
         with open(ti_path, "wb") as f: pickle.dump((tfidf_titles, tfidf_matrix_t), f, protocol=4)
         log.info("Content-based model trained and cached.")
 
@@ -321,7 +321,7 @@ def get_content_recommendations(title: str, n: int = 10):
     Given a movie title (or partial match), return N similar movies
     using cosine similarity on genre+title TF-IDF vectors.
     """
-    if cosine_sim is None:
+    if combined_norm is None:
         return []
 
     # Try exact match first, then fuzzy
@@ -335,8 +335,10 @@ def get_content_recommendations(title: str, n: int = 10):
     if idx is None:
         return []
 
-    sim_scores = list(enumerate(cosine_sim[idx]))
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)[1:n+1]
+    query_vec = combined_norm[idx]
+    sim_scores = cosine_similarity(query_vec, combined_norm).flatten()
+    sim_scores_indexed = list(enumerate(sim_scores))
+    sim_scores = sorted(sim_scores_indexed, key=lambda x: x[1], reverse=True)[1:n+1]
 
     result_ids = [idx_movie[i] for i, _ in sim_scores]
     scores     = [round(float(s), 3) for _, s in sim_scores]
