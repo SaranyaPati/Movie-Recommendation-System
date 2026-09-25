@@ -1,0 +1,1250 @@
+/* =========================================================
+   Movies – Premium Movie Recommendation System
+   Deep Ocean Teal Theme | Clean Solid Design
+   ========================================================= */
+
+/* ── 1. Reset & Tokens ─────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    /* ── Color Palette: Deep Ocean Teal ── */
+    --clr-bg:          #06101e;
+    --clr-surface:     #0c1e35;
+    --clr-surface-2:   #122844;
+    --clr-surface-3:   #1a3457;
+
+    --clr-border:      rgba(14, 184, 168, 0.18);
+    --clr-border-soft: rgba(255, 255, 255, 0.07);
+
+    /* Primary: Vibrant Teal */
+    --clr-primary:       #0eb8a8;
+    --clr-primary-dark:  #099589;
+    --clr-primary-glow:  rgba(14, 184, 168, 0.28);
+    --clr-primary-faint: rgba(14, 184, 168, 0.10);
+
+    /* Accent: Warm Amber */
+    --clr-accent:     #f0a030;
+    --clr-accent-dim: rgba(240, 160, 48, 0.15);
+    --clr-gold:       #fbbf24;
+
+    /* Utility: Success Green */
+    --clr-green:      #34d399;
+    --clr-green-dim:  rgba(52, 211, 153, 0.15);
+
+    /* Text */
+    --clr-text:        #ddeef5;
+    --clr-text-muted:  #6b93aa;
+    --clr-text-dim:    #354e5e;
+
+    /* Gradients */
+    --grad-hero:    linear-gradient(160deg, #06101e 0%, #091826 60%, #06101e 100%);
+    --grad-primary: linear-gradient(135deg, #0eb8a8, #0dd4c0);
+    --grad-accent:  linear-gradient(135deg, #f0a030, #fbbf24);
+    --grad-card:    linear-gradient(180deg, #0c1e35 0%, #091626 100%);
+    --grad-hero-overlay: linear-gradient(180deg, rgba(6,16,30,0.4) 0%, rgba(6,16,30,0.92) 100%);
+
+    /* Typography */
+    --font-main: 'Outfit', system-ui, sans-serif;
+
+    /* Spacing */
+    --radius-sm:   6px;
+    --radius-md:   12px;
+    --radius-lg:   18px;
+    --radius-xl:   24px;
+    --radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-card:   0 4px 24px rgba(0, 0, 0, 0.55);
+    --shadow-glow:   0 0 28px var(--clr-primary-glow);
+    --shadow-navbar: 0 2px 20px rgba(0, 0, 0, 0.7);
+    --shadow-hover:  0 12px 40px rgba(0, 0, 0, 0.6), 0 0 24px var(--clr-primary-glow);
+
+    /* Transitions */
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── 2. Base ────────────────────────────────────────────── */
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--clr-bg);
+    color: var(--clr-text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* ── 3. Background ──────────────────────────────────────── */
+
+
+.bg-overlay {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 15% 50%, rgba(14,184,168,0.06) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 10%, rgba(240,160,48,0.05) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(6,16,30,0.55) 0%, rgba(6,16,30,0.88) 100%);
+    z-index: -1;
+}
+
+/* ── 4. Particles ───────────────────────────────────────── */
+.particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    bottom: -10px;
+    border-radius: 50%;
+    background: var(--clr-primary);
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.5; }
+    90%  { opacity: 0.2; }
+    100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+
+/* ── 5. Navigation ──────────────────────────────────────── */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2.5rem;
+    transition: all 0.35s var(--ease-smooth);
+}
+
+.navbar.scrolled {
+    background: #071525;
+    border-bottom: 1px solid var(--clr-border);
+    box-shadow: var(--shadow-navbar);
+    padding: 0.7rem 2.5rem;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.brand-icon {
+    font-size: 1.5rem;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.1); }
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: var(--grad-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: var(--clr-text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--grad-primary);
+    border-radius: var(--radius-full);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover { color: var(--clr-text); }
+.nav-link:hover::after { width: 100%; }
+
+/* ── 6. Hero ────────────────────────────────────────────── */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+/* Decorative horizontal lines */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(14,184,168,0.12), transparent);
+    pointer-events: none;
+}
+
+.hero-content {
+    max-width: 780px;
+    animation: heroFadeIn 0.9s var(--ease-smooth) both;
+}
+
+@keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--clr-primary-faint);
+    border: 1px solid var(--clr-border);
+    color: var(--clr-primary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-full);
+    margin-bottom: 1.5rem;
+    animation: heroFadeIn 0.9s 0.1s var(--ease-smooth) both;
+}
+
+.hero-title {
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 1.2rem;
+    letter-spacing: -1.5px;
+    animation: heroFadeIn 0.9s 0.2s var(--ease-smooth) both;
+}
+
+.gradient-text {
+    background: var(--grad-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.05rem;
+    color: var(--clr-text-muted);
+    max-width: 560px;
+    margin: 0 auto 2.5rem;
+    font-weight: 400;
+    animation: heroFadeIn 0.9s 0.3s var(--ease-smooth) both;
+    line-height: 1.7;
+}
+
+/* ── 7. Search ──────────────────────────────────────────── */
+.search-section {
+    animation: heroFadeIn 0.9s 0.4s var(--ease-smooth) both;
+    margin-bottom: 2.5rem;
+}
+
+.search-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--clr-surface);
+    border: 1.5px solid var(--clr-border);
+    border-radius: var(--radius-full);
+    padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+    gap: 0.75rem;
+    max-width: 620px;
+    margin: 0 auto;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-input-wrapper.focused {
+    border-color: var(--clr-primary);
+    box-shadow: 0 0 0 4px var(--clr-primary-faint), var(--shadow-glow);
+}
+
+.search-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+.search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--clr-text);
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 400;
+    min-width: 0;
+}
+
+.search-input::placeholder { color: var(--clr-text-dim); }
+
+.search-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--grad-primary);
+    color: #04111d;
+    border: none;
+    border-radius: var(--radius-full);
+    padding: 0.7rem 1.5rem;
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.25s var(--ease-spring), box-shadow 0.3s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.search-btn:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 24px var(--clr-primary-glow);
+}
+
+.search-btn:active { transform: scale(0.97); }
+
+.btn-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.search-btn:hover .btn-arrow { transform: translateX(4px); }
+
+/* ── 8. Stats Row ───────────────────────────────────────── */
+.stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    animation: heroFadeIn 0.9s 0.5s var(--ease-smooth) both;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.stat-number {
+    font-size: 1.4rem;
+    font-weight: 800;
+    background: var(--grad-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--clr-text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--clr-border-soft);
+}
+
+/* ── 9. Main Content ────────────────────────────────────── */
+.main-content {
+    position: relative;
+    z-index: 1;
+    padding: 0 2rem 5rem;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* ── 10. Solid Card (replaces glass-card) ───────────────── */
+.glass-card {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-xl);
+}
+
+/* ── 11. Filter Section ─────────────────────────────────── */
+.filter-section {
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+.filter-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.section-subtitle {
+    font-size: 0.9rem;
+    color: var(--clr-text-muted);
+}
+
+.filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.filter-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--clr-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.filter-label-icon { font-size: 1rem; }
+
+.select-wrapper {
+    position: relative;
+}
+
+.filter-select {
+    width: 100%;
+    background: var(--clr-surface-2);
+    border: 1.5px solid var(--clr-border-soft);
+    border-radius: var(--radius-md);
+    color: var(--clr-text);
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filter-select option {
+    background: var(--clr-surface);
+    color: var(--clr-text);
+}
+
+.filter-select:hover {
+    border-color: var(--clr-border);
+}
+
+.filter-select:focus {
+    border-color: var(--clr-primary);
+    box-shadow: 0 0 0 3px var(--clr-primary-faint);
+}
+
+.select-arrow {
+    position: absolute;
+    right: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--clr-text-muted);
+    pointer-events: none;
+    font-size: 1rem;
+}
+
+/* Filter action buttons */
+.filter-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--grad-primary);
+    color: #04111d;
+    border: none;
+    border-radius: var(--radius-full);
+    padding: 0.8rem 2rem;
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.25s var(--ease-spring), box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 28px var(--clr-primary-glow);
+}
+
+.btn-primary:active { transform: scale(0.97); }
+
+/* Shine sweep animation */
+.btn-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.20) 50%, transparent 60%);
+    transform: translateX(-100%);
+    transition: transform 0s;
+}
+
+.btn-primary:hover .btn-shine {
+    animation: btnShine 0.6s ease forwards;
+}
+
+@keyframes btnShine {
+    to { transform: translateX(100%); }
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--clr-text-muted);
+    border: 1.5px solid var(--clr-border-soft);
+    border-radius: var(--radius-full);
+    padding: 0.8rem 1.6rem;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-secondary:hover {
+    border-color: var(--clr-primary);
+    color: var(--clr-primary);
+    background: var(--clr-primary-faint);
+}
+
+/* ── 12. Movies Section ─────────────────────────────────── */
+.movies-section {
+    margin-bottom: 4rem;
+}
+
+.movies-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.results-count {
+    font-size: 0.85rem;
+    color: var(--clr-text-muted);
+}
+
+/* ── 13. Movie Grid ─────────────────────────────────────── */
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.4rem;
+}
+
+/* ── 14. Movie Card ─────────────────────────────────────── */
+.movie-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+    transition:
+        opacity 0.5s var(--ease-smooth),
+        transform 0.5s var(--ease-smooth),
+        box-shadow 0.3s ease;
+    border: 1px solid var(--clr-border-soft);
+}
+
+.movie-card.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.movie-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--clr-border);
+    z-index: 5;
+}
+
+.card-poster {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--clr-surface-2), var(--clr-surface-3));
+}
+
+.card-poster.skeleton {
+    background: linear-gradient(135deg, var(--clr-surface), var(--clr-surface-2), var(--clr-surface));
+    background-size: 200% 200%;
+    animation: shimmer 2.5s linear infinite;
+}
+
+@keyframes shimmer {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.poster-placeholder {
+    font-size: 3rem;
+    opacity: 0.3;
+    user-select: none;
+}
+
+.card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(6,16,30,0) 40%, rgba(6,16,30,0.92) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.movie-card:hover .card-overlay { opacity: 1; }
+
+.play-btn {
+    width: 52px;
+    height: 52px;
+    background: var(--clr-primary);
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 50%;
+    color: #04111d;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transform: scale(0.8);
+    transition: transform 0.3s var(--ease-spring), background 0.2s ease;
+    font-weight: 700;
+}
+
+.movie-card:hover .play-btn {
+    transform: scale(1);
+}
+
+.play-btn:hover {
+    background: var(--clr-primary-dark);
+    transform: scale(1.12) !important;
+}
+
+.card-badge {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    background: rgba(6,16,30,0.85);
+    color: var(--clr-gold);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.25rem 0.55rem;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(251,191,36,0.3);
+}
+
+.card-info {
+    background: var(--clr-surface);
+    padding: 0.9rem;
+    border-top: 1px solid var(--clr-border-soft);
+}
+
+.card-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--clr-text);
+}
+
+.card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-genre {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-full);
+    background: var(--clr-primary-faint);
+    color: var(--clr-primary);
+    border: 1px solid var(--clr-border);
+}
+
+.card-year {
+    font-size: 0.73rem;
+    color: var(--clr-text-muted);
+}
+
+/* ── 15. Recommendations container ─────────────────────── */
+.recommendations-container {
+    margin-top: 2rem;
+}
+
+/* ── 16. Footer ─────────────────────────────────────────── */
+.footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid var(--clr-border);
+    background: var(--clr-surface);
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-tagline {
+    font-size: 0.85rem;
+    color: var(--clr-text-dim);
+}
+
+/* ── 17. Scrollbar ──────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--clr-bg);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--clr-primary);
+    border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--clr-primary-dark);
+}
+
+/* ── 18. Selection color ────────────────────────────────── */
+::selection {
+    background: rgba(14, 184, 168, 0.30);
+    color: #fff;
+}
+
+/* ── 19. Responsive ─────────────────────────────────────── */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1rem 1.25rem;
+    }
+
+    .navbar.scrolled {
+        padding: 0.7rem 1.25rem;
+    }
+
+    .hero {
+        padding: 7rem 1.25rem 3rem;
+    }
+
+    .hero-title {
+        font-size: 2.2rem;
+        letter-spacing: -0.8px;
+    }
+
+    .search-btn span:first-child {
+        display: none;
+    }
+
+    .main-content {
+        padding: 0 1.25rem 4rem;
+    }
+
+    .filter-section {
+        padding: 1.75rem 1.25rem;
+    }
+
+    .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .movies-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stats-row {
+        gap: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-name { font-size: 1.25rem; }
+    .nav-link   { display: none; }
+    .hero-badge { font-size: 0.75rem; }
+
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .movie-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ── 20. nav-brand as link ──────────────────────────────── */
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* ── 21. Empty State ────────────────────────────────────── */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 2rem;
+    text-align: center;
+    gap: 0.75rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.empty-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--clr-text);
+}
+
+.empty-text {
+    font-size: 1rem;
+    color: var(--clr-text-muted);
+    max-width: 340px;
+}
+
+/* ── 22. Modal ──────────────────────────────────────────── */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 10, 18, 0.82);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease-smooth);
+}
+
+.modal-backdrop.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-xl);
+    max-width: 480px;
+    width: 100%;
+    padding: 2.5rem;
+    position: relative;
+    transform: translateY(30px) scale(0.96);
+    transition: transform 0.4s var(--ease-spring);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 40px var(--clr-primary-glow);
+}
+
+.modal-backdrop.active .modal {
+    transform: translateY(0) scale(1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+    background: var(--clr-surface-2);
+    border: 1px solid var(--clr-border-soft);
+    color: var(--clr-text-muted);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: var(--clr-primary-faint);
+    color: var(--clr-primary);
+    border-color: var(--clr-border);
+}
+
+.modal-emoji {
+    font-size: 3.5rem;
+    text-align: center;
+    margin-bottom: 1.2rem;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.modal-badge {
+    display: inline-block;
+    background: var(--clr-primary-faint);
+    color: var(--clr-primary);
+    border: 1px solid var(--clr-border);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-full);
+    margin-bottom: 0.75rem;
+    text-transform: capitalize;
+}
+
+.modal-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+
+.modal-meta {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.modal-meta-item {
+    font-size: 0.88rem;
+    color: var(--clr-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.modal-director {
+    font-size: 0.88rem;
+    color: var(--clr-text-muted);
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.modal-description {
+    font-size: 0.95rem;
+    color: var(--clr-text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* ── 23. ML Algorithm Info Cards ────────────────────────── */
+.algo-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.algo-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    position: relative;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    transition: transform 0.3s var(--ease-spring), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.algo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 18px var(--clr-primary-glow);
+    border-color: var(--clr-primary);
+}
+
+.algo-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--clr-primary-faint);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--clr-border);
+}
+
+.algo-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.algo-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: var(--clr-text);
+}
+
+.algo-desc {
+    font-size: 0.82rem;
+    color: var(--clr-text-muted);
+    line-height: 1.5;
+}
+
+.algo-chip {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    background: var(--clr-green-dim);
+    color: var(--clr-green);
+    border: 1px solid rgba(52, 211, 153, 0.30);
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* ── 24. Collaborative Filtering Panel ──────────────────── */
+.collab-section {
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.collab-form {
+    margin-bottom: 1.5rem;
+}
+
+.collab-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.collab-results {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--clr-border);
+    padding-top: 1.5rem;
+}
+
+.collab-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+/* ── 25. Loading Spinner ─────────────────────────────────── */
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    color: var(--clr-text-muted);
+    font-size: 0.9rem;
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--clr-primary-faint);
+    border-top-color: var(--clr-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── 26. Algorithm Tag ───────────────────────────────────── */
+.algo-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    background: rgba(14, 184, 168, 0.12);
+    color: var(--clr-primary);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+}
+
+/* ── 27. Count Badge on card ─────────────────────────────── */
+.card-count-badge {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    background: rgba(6,16,30,0.80);
+    color: var(--clr-text-muted);
+    font-size: 0.65rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: var(--radius-full);
+}
+
+/* ── 28. Similar Movies Section ─────────────────────────── */
+.similar-section {
+    margin-bottom: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--clr-border);
+}
+
+/* ── 29. Modal genres line ───────────────────────────────── */
+.modal-genres {
+    font-size: 0.85rem;
+    color: var(--clr-text-muted);
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+}
+
+/* ── 30. Nav ML badge ────────────────────────────────────── */
+.nav-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    background: var(--clr-primary-faint);
+    color: var(--clr-primary);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-full);
+    letter-spacing: 0.04em;
+}
+
+/* ── 31. Teal accent line on section titles ─────────────── */
+.section-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 1em;
+    background: var(--grad-primary);
+    border-radius: 2px;
+    margin-right: 0.6rem;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+}
+
+/* ── 32. Divider accent ──────────────────────────────────── */
+.filter-section {
+    position: relative;
+}
+
+.filter-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 2.5rem;
+    right: 2.5rem;
+    height: 2px;
+    background: linear-gradient(90deg, var(--clr-primary), var(--clr-accent), transparent);
+    border-radius: var(--radius-full);
+}
+
+/* ── 33. Collab section top accent ──────────────────────── */
+.collab-section {
+    position: relative;
+}
+
+.collab-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 2.5rem;
+    right: 2.5rem;
+    height: 2px;
+    background: linear-gradient(90deg, var(--clr-accent), var(--clr-primary), transparent);
+    border-radius: var(--radius-full);
+}

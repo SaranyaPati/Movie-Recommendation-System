@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse all movies from the MovieLens dataset with IMDb and TMDb links.">
+    <title>All Movies – MovieLens Dataset</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* ── All Movies Page ─────────────────────────────────── */
+        .am-hero {
+            background: linear-gradient(135deg, #0a0a1a 0%, #0d0d2b 50%, #0a0a1a 100%);
+            padding: 100px 2rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .am-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 20% 50%, rgba(99,102,241,.15) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 80% 50%, rgba(236,72,153,.10) 0%, transparent 70%);
+        }
+        .am-hero-content { position: relative; z-index: 1; }
+        .am-badge {
+            display: inline-flex; align-items: center; gap: .5rem;
+            background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.3);
+            color: #a5b4fc; border-radius: 50px; padding: .4rem 1.2rem;
+            font-size: .8rem; font-weight: 600; letter-spacing: .05em;
+            text-transform: uppercase; margin-bottom: 1.2rem;
+        }
+        .am-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800; color: #fff; margin: 0 0 .8rem; line-height: 1.15;
+        }
+        .am-hero h1 span {
+            background: linear-gradient(135deg, #818cf8, #ec4899);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .am-subtitle {
+            color: rgba(255,255,255,.6); font-size: 1rem; max-width: 600px; margin: 0 auto 2rem;
+        }
+        .am-stats-row {
+            display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap;
+        }
+        .am-stat { text-align: center; }
+        .am-stat-n {
+            font-size: 1.6rem; font-weight: 700;
+            background: linear-gradient(135deg, #818cf8, #ec4899);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .am-stat-l { font-size: .75rem; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .05em; }
+
+        /* ── Sticky Filter Bar ──────────────────────────────── */
+        .am-filter-bar {
+            background: rgba(10,10,26,.85);
+            border-bottom: 1px solid rgba(255,255,255,.07);
+            padding: .85rem 2rem;
+            display: flex; flex-wrap: wrap; gap: .75rem; align-items: center;
+            position: sticky; top: 68px; z-index: 50;
+            backdrop-filter: blur(16px);
+        }
+        .am-filter-bar form {
+            display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; width: 100%;
+        }
+        .am-search-input {
+            flex: 1; min-width: 200px;
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+            color: #fff; border-radius: 10px; padding: .55rem 1rem;
+            font-family: 'Outfit', sans-serif; font-size: .9rem;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .am-search-input::placeholder { color: rgba(255,255,255,.3); }
+        .am-search-input:focus {
+            outline: none; border-color: rgba(99,102,241,.5);
+            box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+        }
+        .am-select {
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+            color: #fff; border-radius: 10px; padding: .55rem .9rem;
+            font-family: 'Outfit', sans-serif; font-size: .85rem; cursor: pointer;
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right .7rem center;
+            padding-right: 2.2rem;
+        }
+        .am-select option { background: #1a1a2e; color: #e2e8f0; }
+        .am-btn-apply {
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            color: #fff; border: none; border-radius: 10px; padding: .55rem 1.4rem;
+            font-family: 'Outfit', sans-serif; font-weight: 600; font-size: .9rem;
+            cursor: pointer; transition: opacity .2s, transform .15s;
+        }
+        .am-btn-apply:hover { opacity: .88; transform: translateY(-1px); }
+        .am-btn-reset {
+            background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+            color: rgba(255,255,255,.7); border-radius: 10px; padding: .55rem 1rem;
+            font-family: 'Outfit', sans-serif; font-size: .9rem; cursor: pointer;
+            text-decoration: none; transition: background .2s;
+        }
+        .am-btn-reset:hover { background: rgba(255,255,255,.13); color: #fff; }
+        .am-results-label {
+            margin-left: auto; color: rgba(255,255,255,.4); font-size: .82rem; white-space: nowrap;
+        }
+
+        /* ── Table ──────────────────────────────────────────── */
+        .am-container { max-width: 1440px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+        .am-table-wrap {
+            background: rgba(255,255,255,.02);
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 16px; overflow: hidden; overflow-x: auto;
+        }
+        .am-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+        .am-table thead tr {
+            background: rgba(99,102,241,.1);
+            border-bottom: 1px solid rgba(99,102,241,.2);
+        }
+        .am-table th {
+            padding: .85rem 1.1rem; text-align: left;
+            font-weight: 600; color: #a5b4fc;
+            font-size: .75rem; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap;
+        }
+        .am-table tbody tr {
+            border-bottom: 1px solid rgba(255,255,255,.04);
+            transition: background .15s;
+        }
+        .am-table tbody tr:hover { background: rgba(99,102,241,.07); }
+        .am-table tbody tr:last-child { border-bottom: none; }
+        .am-table td { padding: .72rem 1.1rem; vertical-align: middle; }
+
+        .col-num   { color: rgba(255,255,255,.2); font-size: .78rem; width: 52px; }
+        .col-id    { color: rgba(255,255,255,.3); font-size: .78rem; }
+        .col-poster { width: 44px; padding: 0.3rem 0.5rem; }
+        .am-poster-img { width: 34px; height: 50px; object-fit: cover; border-radius: 4px; display: block; background: rgba(255,255,255,0.05); }
+        .col-title {
+            font-weight: 600; color: #e2e8f0;
+            max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .col-year  { color: rgba(255,255,255,.5); white-space: nowrap; font-size: .85rem; }
+        .genre-chip {
+            display: inline-block; padding: .2rem .65rem; border-radius: 20px;
+            font-size: .73rem; font-weight: 600;
+            background: rgba(99,102,241,.15); color: #a5b4fc;
+            border: 1px solid rgba(99,102,241,.25); white-space: nowrap;
+        }
+        .col-rating {
+            display: inline-flex; align-items: center; gap: .3rem;
+            color: #fbbf24; font-weight: 700; font-size: .88rem; white-space: nowrap;
+        }
+        .col-votes { color: rgba(255,255,255,.35); font-size: .78rem; }
+        .no-val    { color: rgba(255,255,255,.2); font-size: .78rem; }
+
+        .lnk-btn {
+            display: inline-flex; align-items: center; gap: .3rem;
+            padding: .28rem .65rem; border-radius: 7px; font-size: .76rem;
+            font-weight: 600; text-decoration: none; transition: all .15s; white-space: nowrap;
+        }
+        .lnk-imdb {
+            background: rgba(245,197,24,.12); color: #f5c518;
+            border: 1px solid rgba(245,197,24,.25);
+        }
+        .lnk-imdb:hover { background: rgba(245,197,24,.26); transform: translateY(-1px); }
+        .lnk-tmdb {
+            background: rgba(1,180,228,.12); color: #01b4e4;
+            border: 1px solid rgba(1,180,228,.25); margin-left: .35rem;
+        }
+        .lnk-tmdb:hover { background: rgba(1,180,228,.26); transform: translateY(-1px); }
+
+        /* ── Pagination ─────────────────────────────────────── */
+        .am-pagination {
+            display: flex; justify-content: center; align-items: center;
+            gap: .45rem; flex-wrap: wrap; margin-top: 2.5rem;
+        }
+        .pg-btn {
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+            color: rgba(255,255,255,.7); border-radius: 8px; padding: .48rem .9rem;
+            text-decoration: none; font-size: .85rem; font-weight: 500;
+            transition: all .15s; display: inline-flex; align-items: center;
+        }
+        .pg-btn:hover { background: rgba(99,102,241,.2); color: #a5b4fc; border-color: rgba(99,102,241,.4); }
+        .pg-btn.active {
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            color: #fff; border-color: transparent; font-weight: 700;
+        }
+        .pg-btn.disabled { opacity: .3; pointer-events: none; cursor: default; }
+        .pg-ellipsis { color: rgba(255,255,255,.35); font-size: .85rem; padding: 0 .2rem; }
+
+        /* ── Empty state ─────────────────────────────────────── */
+        .am-empty { text-align: center; padding: 5rem 2rem; color: rgba(255,255,255,.35); }
+        .am-empty-icon { font-size: 4rem; display: block; margin-bottom: 1rem; }
+        .am-empty h3 { color: rgba(255,255,255,.6); margin-bottom: .5rem; font-size: 1.3rem; }
+
+        /* ── Responsive ─────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .am-table th:nth-child(2), .am-table td:nth-child(2) { display: none; }
+        }
+        @media (max-width: 640px) {
+            .am-table th:nth-child(8), .am-table td:nth-child(8) { display: none; }
+            .col-title { max-width: 180px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <a href="/" class="nav-brand">
+            <span class="brand-icon">🎬</span>
+            <span class="brand-name">Movies</span>
+        </a>
+        <div class="nav-actions">
+            <a href="/all-movies" class="nav-link" style="color:#a5b4fc;font-weight:700;">All Movies</a>
+            <a href="/search" class="nav-link">Browse</a>
+            <a href="/" class="nav-link">Home</a>
+            <span class="nav-badge" title="Powered by ML">🧠 ML</span>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="am-hero">
+        <div class="am-hero-content">
+            <div class="am-badge">📽️ Complete Dataset</div>
+            <h1>All <span>{{ total_movies | int }}</span> Movies</h1>
+            <p class="am-subtitle">
+                Every film in the MovieLens dataset — browse, filter, and jump straight to
+                <strong>IMDb</strong> or <strong>TMDb</strong> with one click.
+            </p>
+            <div class="am-stats-row">
+                <div class="am-stat">
+                    <div class="am-stat-n">{{ total_movies | int }}</div>
+                    <div class="am-stat-l">Total Movies</div>
+                </div>
+                <div class="am-stat">
+                    <div class="am-stat-n">{{ total }}</div>
+                    <div class="am-stat-l">Matching</div>
+                </div>
+                <div class="am-stat">
+                    <div class="am-stat-n">{{ page }} / {{ pages }}</div>
+                    <div class="am-stat-l">Page</div>
+                </div>
+                <div class="am-stat">
+                    <div class="am-stat-n">100</div>
+                    <div class="am-stat-l">Per Page</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sticky Filter Bar -->
+    <div class="am-filter-bar">
+        <form action="/all-movies" method="GET" id="am-filter-form">
+            <input type="text" name="query" id="am-search" class="am-search-input"
+                   placeholder="🔍  Search title…" value="{{ query or '' }}" autocomplete="off">
+
+            <select name="genre" class="am-select">
+                <option value="all"         {% if (selected_genre or 'all') == 'all'         %}selected{% endif %}>All Genres</option>
+                <option value="Action"      {% if selected_genre == 'Action'      %}selected{% endif %}>🔥 Action</option>
+                <option value="Adventure"   {% if selected_genre == 'Adventure'   %}selected{% endif %}>🌍 Adventure</option>
+                <option value="Animation"   {% if selected_genre == 'Animation'   %}selected{% endif %}>🎨 Animation</option>
+                <option value="Comedy"      {% if selected_genre == 'Comedy'      %}selected{% endif %}>😂 Comedy</option>
+                <option value="Crime"       {% if selected_genre == 'Crime'       %}selected{% endif %}>🔫 Crime</option>
+                <option value="Documentary" {% if selected_genre == 'Documentary' %}selected{% endif %}>📽️ Documentary</option>
+                <option value="Drama"       {% if selected_genre == 'Drama'       %}selected{% endif %}>🎭 Drama</option>
+                <option value="Fantasy"     {% if selected_genre == 'Fantasy'     %}selected{% endif %}>🧙 Fantasy</option>
+                <option value="Horror"      {% if selected_genre == 'Horror'      %}selected{% endif %}>👻 Horror</option>
+                <option value="Mystery"     {% if selected_genre == 'Mystery'     %}selected{% endif %}>🔍 Mystery</option>
+                <option value="Romance"     {% if selected_genre == 'Romance'     %}selected{% endif %}>💕 Romance</option>
+                <option value="Sci-Fi"      {% if selected_genre == 'Sci-Fi'      %}selected{% endif %}>🚀 Sci-Fi</option>
+                <option value="Thriller"    {% if selected_genre == 'Thriller'    %}selected{% endif %}>😱 Thriller</option>
+                <option value="War"         {% if selected_genre == 'War'         %}selected{% endif %}>⚔️ War</option>
+                <option value="Western"     {% if selected_genre == 'Western'     %}selected{% endif %}>🤠 Western</option>
+            </select>
+
+            <select name="rating" class="am-select">
+                <option value="0"   {% if (selected_rating or '0') == '0' %}selected{% endif %}>All Ratings</option>
+                <option value="4.5" {% if selected_rating == '4.5' %}selected{% endif %}>★ 4.5+</option>
+                <option value="4"   {% if selected_rating == '4'   %}selected{% endif %}>★ 4.0+</option>
+                <option value="3.5" {% if selected_rating == '3.5' %}selected{% endif %}>★ 3.5+</option>
+                <option value="3"   {% if selected_rating == '3'   %}selected{% endif %}>★ 3.0+</option>
+            </select>
+
+            <select name="year" class="am-select">
+                <option value="all"     {% if (selected_year or 'all') == 'all'     %}selected{% endif %}>All Eras</option>
+                <option value="2010s"   {% if selected_year == '2010s'   %}selected{% endif %}>2010s</option>
+                <option value="2000s"   {% if selected_year == '2000s'   %}selected{% endif %}>2000s</option>
+                <option value="classic" {% if selected_year == 'classic' %}selected{% endif %}>Classic (&lt;2000)</option>
+            </select>
+
+            <input type="hidden" name="page" value="1">
+            <input type="hidden" name="per_page" value="100">
+
+            <button type="submit" class="am-btn-apply" id="am-apply-btn">Apply</button>
+            <a href="/all-movies" class="am-btn-reset" id="am-reset-btn">↺ Reset</a>
+            <span class="am-results-label">{{ total }} movies &nbsp;·&nbsp; page {{ page }} / {{ pages }}</span>
+        </form>
+    </div>
+
+    <!-- Main Table -->
+    <main class="am-container">
+        {% if movies %}
+        <div class="am-table-wrap">
+            <table class="am-table" id="am-table">
+                <thead>
+                    <tr>
+                        <th class="col-num">#</th>
+                        <th class="col-id">ID</th>
+                        <th></th>
+                        <th>Title</th>
+                        <th>Year</th>
+                        <th>Genre</th>
+                        <th>Rating</th>
+                        <th>Votes</th>
+                        <th>Links</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movie in movies %}
+                    <tr class="am-row">
+                        <td class="col-num">{{ (page - 1) * per_page + loop.index }}</td>
+                        <td class="col-id">{{ movie.id }}</td>
+                        <td class="col-poster">
+                            {% if movie.tmdb_id %}
+                            <img src="/api/poster/{{ movie.tmdb_id }}" alt="" class="am-poster-img" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="col-title" title="{{ movie.full_title }}">{{ movie.title }}</div>
+                        </td>
+                        <td class="col-year">{{ movie.year }}</td>
+                        <td>
+                            <span class="genre-chip">{{ movie.first_genre }}</span>
+                        </td>
+                        <td>
+                            {% if movie.rating > 0 %}
+                            <span class="col-rating">⭐ {{ movie.rating }}</span>
+                            {% else %}
+                            <span class="no-val">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="col-votes">
+                            {% if movie.rating_count > 0 %}
+                            {{ "{:,}".format(movie.rating_count) }}
+                            {% else %}
+                            <span class="no-val">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if movie.imdb_url %}
+                            <a href="{{ movie.imdb_url }}" target="_blank" rel="noopener noreferrer"
+                               class="lnk-btn lnk-imdb" title="View on IMDb">🎬 IMDb</a>
+                            {% endif %}
+                            {% if movie.tmdb_url %}
+                            <a href="{{ movie.tmdb_url }}" target="_blank" rel="noopener noreferrer"
+                               class="lnk-btn lnk-tmdb" title="View on TMDb">🎞️ TMDb</a>
+                            {% endif %}
+                            {% if not movie.imdb_url and not movie.tmdb_url %}
+                            <span class="no-val">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% macro page_url(p) %}
+            /all-movies?page={{ p }}&per_page={{ per_page }}&query={{ query or '' }}&genre={{ selected_genre or 'all' }}&rating={{ selected_rating or '0' }}&year={{ selected_year or 'all' }}
+        {% endmacro %}
+
+        <nav class="am-pagination" aria-label="Pagination">
+            <!-- Prev -->
+            {% if page > 1 %}
+            <a href="{{ page_url(page - 1) }}" class="pg-btn" id="pg-prev">← Prev</a>
+            {% else %}
+            <span class="pg-btn disabled">← Prev</span>
+            {% endif %}
+
+            <!-- Window of pages -->
+            {% set start_p = [1, page - 3] | max %}
+            {% set end_p   = [pages, page + 3] | min %}
+
+            {% if start_p > 1 %}
+            <a href="{{ page_url(1) }}" class="pg-btn">1</a>
+            {% if start_p > 2 %}<span class="pg-ellipsis">…</span>{% endif %}
+            {% endif %}
+
+            {% for p_num in range(start_p, end_p + 1) %}
+            <a href="{{ page_url(p_num) }}"
+               class="pg-btn{% if p_num == page %} active{% endif %}">{{ p_num }}</a>
+            {% endfor %}
+
+            {% if end_p < pages %}
+            {% if end_p < pages - 1 %}<span class="pg-ellipsis">…</span>{% endif %}
+            <a href="{{ page_url(pages) }}" class="pg-btn">{{ pages }}</a>
+            {% endif %}
+
+            <!-- Next -->
+            {% if page < pages %}
+            <a href="{{ page_url(page + 1) }}" class="pg-btn" id="pg-next">Next →</a>
+            {% else %}
+            <span class="pg-btn disabled">Next →</span>
+            {% endif %}
+        </nav>
+
+        {% else %}
+        <div class="am-empty">
+            <span class="am-empty-icon">🎬</span>
+            <h3>No movies found</h3>
+            <p>Try adjusting your search or filters.</p>
+            <a href="/all-movies" class="am-btn-reset" style="display:inline-block;margin-top:1.2rem;">↺ Reset</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="brand-icon">🎬</span>
+                <span class="brand-name">Movies</span>
+            </div>
+            <p class="footer-tagline">
+                MovieLens dataset &nbsp;·&nbsp; {{ total_movies | int }} movies
+                &nbsp;·&nbsp; IMDb &amp; TMDb links &nbsp;·&nbsp; Built with Flask &amp; scikit-learn
+            </p>
+        </div>
+    </footer>
+
+    <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+        document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Animate rows on scroll
+    const rows = document.querySelectorAll('.am-row');
+    const rowObs = new IntersectionObserver((entries) => {
+        entries.forEach((e, i) => {
+            if (e.isIntersecting) {
+                setTimeout(() => {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateX(0)';
+                }, i * 6);
+                rowObs.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.01 });
+
+    rows.forEach(r => {
+        r.style.opacity = '0';
+        r.style.transform = 'translateX(-8px)';
+        r.style.transition = 'opacity .28s ease, transform .28s ease';
+        rowObs.observe(r);
+    });
+
+    // Submit on Enter in search box
+    document.getElementById('am-search').addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('am-filter-form').submit();
+        }
+    });
+
+    if (window.location.search) {
+        const tableElement = document.getElementById('am-table') || document.querySelector('.am-empty');
+        if (tableElement) {
+            setTimeout(() => {
+                tableElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    }
+    </script>
+</body>
+</html>
